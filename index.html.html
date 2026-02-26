@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>天赋探测仪 · 你最合适的人生道路</title>
+    <!-- Font Awesome 6 (免费) 用于图标配图 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- 柔和字体 & 基础样式 -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+        body {
+            background: linear-gradient(145deg, #f0f4fa 0%, #e6ecf5 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 1.2rem;
+        }
+        .test-wrapper {
+            max-width: 900px;
+            width: 100%;
+            background: rgba(255,255,255,0.6);
+            backdrop-filter: blur(8px);
+            border-radius: 2.5rem;
+            box-shadow: 0 20px 40px -12px rgba(0,20,40,0.25), 0 8px 24px -6px rgba(0,32,64,0.1);
+            padding: 2rem 1.8rem;
+            transition: all 0.2s ease;
+        }
+        h1 {
+            font-size: 2rem;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            background: linear-gradient(135deg, #1A2A4F, #2C3F66);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.3rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .subhead {
+            color: #4a5b7a;
+            font-weight: 400;
+            font-size: 1rem;
+            margin-bottom: 2rem;
+            padding-bottom: 0.8rem;
+            border-bottom: 2px dashed #b5c8e2;
+        }
+        .quiz-section, .result-section {
+            transition: opacity 0.25s;
+        }
+        .result-section {
+            text-align: center;
+            padding: 0.5rem 0 1rem;
+        }
+        .question-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin: 1.8rem 0 2rem;
+            max-height: 540px;
+            overflow-y: auto;
+            padding-right: 0.8rem;
+            scrollbar-width: thin;
+            scrollbar-color: #a0b8d4 #dfe8f2;
+        }
+        .question-grid::-webkit-scrollbar {
+            width: 6px;
+        }
+        .question-grid::-webkit-scrollbar-track {
+            background: #dfe8f2;
+            border-radius: 20px;
+        }
+        .question-grid::-webkit-scrollbar-thumb {
+            background: #a0b8d4;
+            border-radius: 20px;
+        }
+        .question-card {
+            background: #ffffffdd;
+            backdrop-filter: blur(2px);
+            border: 1px solid #ffffff;
+            border-radius: 1.8rem;
+            padding: 1.3rem 1.5rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.02);
+            transition: 0.15s;
+        }
+        .question-card:hover {
+            background: #fffffff2;
+            border-color: #cad8ed;
+        }
+        .q-text {
+            font-weight: 500;
+            color: #1a2c44;
+            font-size: 1.02rem;
+            line-height: 1.4;
+            margin-bottom: 1rem;
+            padding-left: 0.2rem;
+        }
+        .options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.5rem 2rem;
+            align-items: center;
+            justify-content: flex-start;
+        }
+        .option-item {
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+            cursor: pointer;
+            font-size: 0.95rem;
+            color: #2f405c;
+            transition: 0.1s;
+        }
+        .option-item input[type="radio"] {
+            appearance: none;
+            width: 1.1rem;
+            height: 1.1rem;
+            border: 2px solid #b3c6e0;
+            border-radius: 50%;
+            margin-right: 0.2rem;
+            transition: 0.1s;
+            cursor: pointer;
+            background: white;
+        }
+        .option-item input[type="radio"]:checked {
+            border-color: #2b4b7c;
+            background-color: #2b4b7c;
+            box-shadow: inset 0 0 0 3px white;
+        }
+        .option-item span {
+            font-weight: 400;
+        }
+        .btn-primary, .btn-secondary {
+            border: none;
+            padding: 0.9rem 2.2rem;
+            border-radius: 60px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.15s;
+            box-shadow: 0 8px 16px -8px rgba(30,60,90,0.2);
+            letter-spacing: 0.3px;
+        }
+        .btn-primary {
+            background: #1e2f4b;
+            color: white;
+            margin-right: 1rem;
+        }
+        .btn-primary:hover {
+            background: #0f1f36;
+            transform: scale(1.02);
+            box-shadow: 0 12px 22px -10px #1a2f4b;
+        }
+        .btn-secondary {
+            background: white;
+            color: #1e2f4b;
+            border: 1px solid #bbcce2;
+        }
+        .btn-secondary:hover {
+            background: #ecf2fc;
+            border-color: #8fa6cc;
+        }
+        .action-bar {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        .result-card {
+            background: white;
+            border-radius: 2.2rem;
+            padding: 2.5rem 1.8rem;
+            box-shadow: 0 20px 40px -12px #142b44;
+            margin: 1rem 0 2rem;
+        }
+        .result-icon {
+            font-size: 4.5rem;
+            color: #1e2f4b;
+            background: #e7eefb;
+            width: 110px;
+            height: 110px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.4rem;
+            box-shadow: 0 6px 14px #cddcf0;
+        }
+        .result-name {
+            font-size: 2.3rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            color: #112131;
+            line-height: 1.2;
+            margin-bottom: 0.75rem;
+        }
+        .result-desc {
+            font-size: 1.12rem;
+            color: #2f405c;
+            line-height: 1.5;
+            max-width: 550px;
+            margin: 0.8rem auto 1.5rem;
+            background: #f3f8ff;
+            padding: 1.2rem 1.8rem;
+            border-radius: 40px;
+        }
+        .footnote {
+            color: #6d7b95;
+            font-size: 0.85rem;
+            margin-top: 1.8rem;
+            font-style: italic;
+        }
+        .hidden {
+            display: none;
+        }
+        .flex-row {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+            justify-content: center;
+        }
+        .badge-light {
+            background: #dce6f5;
+            border-radius: 30px;
+            padding: 0.2rem 1rem;
+            font-size: 0.9rem;
+            color: #1e2f4b;
+        }
+        /* 小提示 */
+        .note {
+            background: #fafcff;
+            border-radius: 40px;
+            padding: 0.5rem 1.2rem;
+            color: #516b8a;
+            font-size: 0.9rem;
+        }
+        i {
+            color: #1f3a5f;
+        }
+        hr {
+            border: 1px solid #d8e2f0;
+            margin: 1.2rem 0;
+        }
+    </style>
+</head>
+<body>
+<div class="test-wrapper" id="testWrapper">
+    <h1>
+        <i class="fas fa-compass" style="font-size: 2rem; color:#253c5c;"></i> 
+        天赋探测仪
+    </h1>
+    <div class="subhead">40道题 · 发现你最合适的人生道路</div>
+
+    <!-- 问卷区域 (动态渲染) -->
+    <div id="quizSection" class="quiz-section"></div>
+
+    <!-- 结果区域 (初始隐藏) -->
+    <div id="resultSection" class="result-section hidden"></div>
+</div>
+
+<script>
+(function() {
+    // ----- 1. 定义8种结果类型 (名称, 描述, 图标) -----
+    const DIMENSIONS = [
+        { 
+            name: '开拓的创业家', 
+            desc: '你充满激情，敢于冒险，拥有天生的领导才能与说服力。善于发现商机、整合资源，享受从0到1的开拓。适合道路：创业者、项目负责人、销售总监、品牌创始人。', 
+            icon: 'fa-solid fa-rocket' 
+        },
+        { 
+            name: '深沉的思考者', 
+            desc: '理性、好奇、享受深度探索。你追求逻辑与真理，喜欢在专业领域钻研到底。适合道路：科学家、大学教授、数据分析师、战略顾问、哲学家。', 
+            icon: 'fa-solid fa-brain' 
+        },
+        { 
+            name: '温暖的助人者', 
+            desc: '富有同理心，乐于奉献，善于倾听与沟通。你从帮助他人中获得巨大满足。适合道路：教师、心理咨询师、医生/护士、社会工作者、人力资源。', 
+            icon: 'fa-solid fa-hand-holding-heart' 
+        },
+        { 
+            name: '不羁的艺术家', 
+            desc: '敏感、富有想象力，追求美与个性。你讨厌被规则束缚，渴望通过创作表达自我。适合道路：设计师、作家、音乐人、画家、导演、自由创作者。', 
+            icon: 'fa-solid fa-palette' 
+        },
+        { 
+            name: '可靠的守护者', 
+            desc: '务实、负责、有条理。你擅长维护规则、执行计划，是团队里最值得信赖的成员。适合道路：公务员、会计师、工程师、行政人员、数据管理。', 
+            icon: 'fa-solid fa-shield-halved' 
+        },
+        { 
+            name: '好奇的探索者', 
+            desc: '热爱冒险与新鲜体验，无法忍受一成不变。你的双手和身体里藏着无限能量。适合道路：导游、探险家、体育运动员、户外教练、摄影师。', 
+            icon: 'fa-solid fa-mountain-sun' 
+        },
+        { 
+            name: '精明的建设者', 
+            desc: '对数字与实物敏感，目标明确且务实。你喜欢看得见的成果——建筑、财富、产品。适合道路：建筑师、金融分析师、工程师、手工艺人、农场主。', 
+            icon: 'fa-solid fa-helmet-safety' 
+        },
+        { 
+            name: '智慧的整合者', 
+            desc: '博学、善于跨界，总能将不同领域的知识融会贯通。你看问题的高度常常超越常人。适合道路：跨学科学家、教育家、战略规划师、作家、精神导师。', 
+            icon: 'fa-solid fa-crystal' 
+        }
+    ];
+
+    // ----- 2. 题目列表 (40题) 及 每个题对应的维度索引 (0~7) -----
+    const questionTexts = [
+        "和朋友在一起聊聊天、聚个餐，能让我迅速恢复精力。",
+        "比起热闹的聚会，我更喜欢独处，享受一个人的宁静时光。",
+        "我常常是朋友圈子里那个组织活动、出主意的人。",
+        "在团队合作中，我更倾向于做那个默默执行、把事情做好的人。",
+        "我更喜欢学习有既定规则和公式的知识（如数学、物理）。",
+        "我着迷于那些没有标准答案、充满想象空间的问题（如艺术创作、哲学思考）。",
+        "遇到问题时，我习惯按部就班，一步一步地去解决。",
+        "我总能从看似不相关的事物之间，发现意想不到的联系。",
+        "在做决定前，我习惯先列出详细的利弊清单来分析。",
+        "我做决定时，很大程度上会受自己当时的情感和直觉影响。",
+        "我喜欢动手操作，比如做实验、修东西、做手工。",
+        "我更擅长通过阅读或听讲来吸收信息。",
+        "我对音乐、绘画、电影等艺术形式非常敏感，很容易沉浸其中。",
+        "我善于观察别人的情绪变化，能敏锐地察觉到气氛不对。",
+        "看到别人遇到困难，我总是忍不住想去帮一把。",
+        "我喜欢研究和探索人类复杂的行为和心理动机。",
+        "我乐于向别人传授知识、分享经验，并从中获得成就感。",
+        "在团队里，我经常扮演那个“和事佬”的角色，调和大家的矛盾。",
+        "比起直接与人打交道，我更喜欢和数据、代码、机器打交道。",
+        "我很享受在众人面前演讲、表演或展示自己。",
+        "我渴望创造属于自己的东西（一个作品、一个品牌、一家公司）。",
+        "我对权力和影响力有欲望，希望自己能成为一个领导者。",
+        "我更享受在一个稳定、有序的环境中，把本职工作做到极致。",
+        "我追求的是在专业领域内不断突破，成为顶尖的专家。",
+        "我对金钱和数字很敏感，喜欢研究投资理财。",
+        "对我来说，工作的意义远不止赚钱，更重要的是实现自我价值。",
+        "我喜欢尝试从未吃过的食物，去从未去过的地方冒险。",
+        "我是一个比较传统的人，喜欢遵循既定的社会规范和习惯。",
+        "我认为人生充满不确定性，随遇而安是最好的态度。",
+        "我相信凡事预则立，喜欢制定计划并严格执行。",
+        "如果规则不合理，我会试图去挑战和改变它。",
+        "我做事比较谨慎，会尽量避免风险和意外。",
+        "追求真理、探索未知，对我有巨大的吸引力。",
+        "创造一个美丽、和谐、有美感的环境，让我充满动力。",
+        "帮助他人成长和进步，能给我带来最大的快乐。",
+        "获得他人的认可和尊重，是我非常重要的动力来源。",
+        "拥有独立自主的空间，不被别人干涉，对我来说至关重要。",
+        "拥有亲密、稳固的家庭和社交关系，是我幸福的基石。",
+        "我经常幻想未来的世界会是什么样子，以及我在其中的角色。",
+        "回顾过去，我觉得自己总是那个“想法很多”的人。"
+    ];
+
+    // 每个题目对应的维度索引 (手工分配保证每个维度5题，与上面一致)
+    const questionDim = [
+        2, // 0: 助人者
+        1, // 1: 思考者
+        0, // 2: 创业家
+        4, // 3: 守护者
+        1, // 4: 思考者
+        3, // 5: 艺术家
+        4, // 6: 守护者
+        7, // 7: 整合者
+        1, // 8: 思考者
+        3, // 9: 艺术家
+        5, // 10: 探索者
+        1, // 11: 思考者
+        3, // 12: 艺术家
+        2, // 13: 助人者
+        2, // 14: 助人者
+        2, // 15: 助人者
+        2, // 16: 助人者
+        7, // 17: 整合者
+        6, // 18: 建设者
+        0, // 19: 创业家
+        3, // 20: 艺术家
+        0, // 21: 创业家
+        4, // 22: 守护者
+        6, // 23: 建设者
+        6, // 24: 建设者
+        7, // 25: 整合者
+        5, // 26: 探索者
+        4, // 27: 守护者
+        5, // 28: 探索者
+        4, // 29: 守护者
+        0, // 30: 创业家
+        6, // 31: 建设者
+        1, // 32: 思考者
+        3, // 33: 艺术家
+        7, // 34: 整合者
+        0, // 35: 创业家
+        5, // 36: 探索者
+        7, // 37: 整合者
+        5, // 38: 探索者
+        6  // 39: 建设者
+    ];
+
+    // 确保长度40
+    if (questionDim.length !== 40 || questionTexts.length !== 40) console.warn("题目数量不对");
+
+    // 获取容器
+    const quizSection = document.getElementById('quizSection');
+    const resultSection = document.getElementById('resultSection');
+
+    // 渲染问卷表单
+    function renderQuiz() {
+        let html = `<form id="quizForm" class="quiz-form">`;
+        html += `<div class="question-grid">`;
+        questionTexts.forEach((text, idx) => {
+            html += `
+                <div class="question-card">
+                    <div class="q-text">${idx+1}. ${text}</div>
+                    <div class="options">
+                        <label class="option-item"><input type="radio" name="q${idx}" value="5" required> <span>非常符合</span></label>
+                        <label class="option-item"><input type="radio" name="q${idx}" value="4"> <span>比较符合</span></label>
+                        <label class="option-item"><input type="radio" name="q${idx}" value="3"> <span>不确定</span></label>
+                        <label class="option-item"><input type="radio" name="q${idx}" value="2"> <span>比较不符</span></label>
+                        <label class="option-item"><input type="radio" name="q${idx}" value="1"> <span>非常不符</span></label>
+                    </div>
+                </div>
+            `;
+        });
+        html += `</div>`;
+        html += `
+            <div class="action-bar">
+                <button type="submit" class="btn-primary"><i class="fa-regular fa-paper-plane" style="margin-right: 6px;"></i> 提交 · 查看结果</button>
+                <span class="note"><i class="fa-regular fa-circle-check"></i> 40题 · 每题必选</span>
+            </div>
+        `;
+        html += `</form>`;
+        quizSection.innerHTML = html;
+        resultSection.classList.add('hidden'); // 确保结果隐藏
+
+        // 绑定submit事件
+        const form = document.getElementById('quizForm');
+        if (form) {
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                calculateResult();
+            });
+        }
+    }
+
+    // 计算得分并显示结果
+    function calculateResult() {
+        const totalQuestions = 40;
+        let scores = new Array(8).fill(0); // 8个维度
+
+        // 检查是否所有题目都选了
+        for (let i = 0; i < totalQuestions; i++) {
+            const radios = document.getElementsByName(`q${i}`);
+            let selectedValue = null;
+            for (let r of radios) {
+                if (r.checked) {
+                    selectedValue = r.value;
+                    break;
+                }
+            }
+            if (selectedValue === null) {
+                alert(`请先完成第 ${i+1} 题再提交 ✨`);
+                return;
+            }
+            // 累加到对应维度 (value是字符, 转数字)
+            const dimIdx = questionDim[i];
+            scores[dimIdx] += parseInt(selectedValue, 10);
+        }
+
+        // 找出最高得分的维度 (取第一个最大值)
+        let maxScore = -1;
+        let bestDim = 0;
+        for (let d = 0; d < scores.length; d++) {
+            if (scores[d] > maxScore) {
+                maxScore = scores[d];
+                bestDim = d;
+            }
+        }
+
+        // 构建结果html
+        const result = DIMENSIONS[bestDim];
+        let resultHtml = `
+            <div class="result-card">
+                <div class="result-icon"><i class="fas ${result.icon}"></i></div>
+                <div class="result-name">${result.name}</div>
+                <div class="result-desc">${result.desc}</div>
+                <div class="flex-row">
+                    <span class="badge-light"><i class="fa-regular fa-star"></i> 主导天赋</span>
+                </div>
+                <hr>
+                <div class="footnote">
+                    <i class="fa-regular fa-lightbulb"></i> 你的得分维度: ${scores.map((s,i)=>`${DIMENSIONS[i].name.slice(0,4)}… ${s}`).join(' · ')}
+                </div>
+            </div>
+            <div class="action-bar">
+                <button class="btn-secondary" id="retakeBtn"><i class="fa-regular fa-rotate-right"></i> 重新测试</button>
+            </div>
+        `;
+
+        resultSection.innerHTML = resultHtml;
+        // 隐藏问卷，显示结果
+        quizSection.classList.add('hidden');
+        resultSection.classList.remove('hidden');
+
+        // 绑定重新测试按钮
+        document.getElementById('retakeBtn')?.addEventListener('click', function() {
+            quizSection.classList.remove('hidden');
+            resultSection.classList.add('hidden');
+            renderQuiz();  // 重新生成表单 (重置所有选项)
+        });
+    }
+
+    // 初始化渲染
+    renderQuiz();
+
+    // 额外：如果结果中的重测被点击，已经绑定，但一开始没有结果，不需要额外操作。
+})();
+</script>
+<!-- 底部装饰说明 -->
+<div style="text-align: center; margin-top: 1rem; color: #6a7e9f; font-size: 0.8rem; opacity: 0.8;">
+    <i class="fa-regular fa-heart"></i> 跟随内心 · 发现你的天赋轨迹
+</div>
+</body>
+</html>
